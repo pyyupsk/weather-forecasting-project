@@ -1,8 +1,9 @@
-import requests
-import pandas as pd
 import os
-from dotenv import load_dotenv
 from datetime import datetime
+
+import pandas as pd
+import requests
+from dotenv import load_dotenv
 
 # โหลดตัวแปร environment variables จากไฟล์ .env
 load_dotenv()
@@ -25,10 +26,7 @@ def fetch_weather_forecast(api_token: str, domain: str, province: str, amphoe: s
         f"?domain={domain}&province={province}&amphoe={amphoe}"
         f"&fields=tc,rh&starttime={start_time}"
     )
-    headers = {
-        'accept': 'application/json',
-        'authorization': f'Bearer {api_token}'
-    }
+    headers = {"accept": "application/json", "authorization": f"Bearer {api_token}"}
 
     # ขอข้อมูลจาก API
     response = requests.get(url, headers=headers)
@@ -40,27 +38,24 @@ def fetch_weather_forecast(api_token: str, domain: str, province: str, amphoe: s
         # การแยกและประมวลผลข้อมูลพยากรณ์อากาศ
         weather_forecast = [
             [
-                item['location']['lat'],
-                item['location']['lon'],
-                forecast['time'],
-                forecast['data']['tc'],
-                forecast['data']['rh']
+                item["location"]["lat"],
+                item["location"]["lon"],
+                forecast["time"],
+                forecast["data"]["tc"],
+                forecast["data"]["rh"],
             ]
-            for item in data['WeatherForecasts']
-            for forecast in item['forecasts']
+            for item in data["WeatherForecasts"]
+            for forecast in item["forecasts"]
         ]
 
         # สร้าง DataFrame
         df = pd.DataFrame(
             weather_forecast,
-            columns=[
-                'Latitude', 'Longitude', 'Time',
-                'Temperature (°C)', 'Humidity (%)'
-            ]
+            columns=["Latitude", "Longitude", "Time", "Temperature (°C)", "Humidity (%)"],  # type: ignore[arg-type]
         )
 
         # บันทึกลงใน CSV
-        csv_file = 'weather_forecast_data.csv'
+        csv_file = "weather_forecast_data.csv"
         df.to_csv(csv_file, index=False)
         print(f"บันทึกข้อมูลลงใน '{csv_file}' เรียบร้อยแล้ว")
     else:
@@ -68,7 +63,7 @@ def fetch_weather_forecast(api_token: str, domain: str, province: str, amphoe: s
 
         if response.status_code == 422:
             print("กำลังทำการดึงข้อมูลจาก API อีกครั้งด้วยเวลาที่กำหนด โปรดรอสักครู่...")
-            start_time = response.text.split('The starttime must be a date after or equal to ')[1].split('.')[0]
+            start_time = response.text.split("The starttime must be a date after or equal to ")[1].split(".")[0]
 
             print(f"กำหนดเวลาเริ่มต้นการดึงข้อมูลวันที่ {start_time}")
             fetch_weather_forecast(api_token, domain, province, amphoe, start_time)
@@ -77,7 +72,7 @@ def fetch_weather_forecast(api_token: str, domain: str, province: str, amphoe: s
 
 
 # โหลด API Token จากตัวแปรสภาพแวดล้อม
-TMD_API_TOKEN: str = os.getenv("TMD_API_TOKEN")
+TMD_API_TOKEN: str | None = os.getenv("TMD_API_TOKEN")
 
 # ตัวอย่างการใช้งาน
 if TMD_API_TOKEN:
