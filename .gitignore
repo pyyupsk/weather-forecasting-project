@@ -150,4 +150,4 @@ dmypy.json
 *.eggs
 
 # Data files
-weather_forecast_data.csv
+weather_*.csv

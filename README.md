@@ -1,84 +1,81 @@
 # โครงการพยากรณ์อากาศ
 
-โปรเจคนี้เป็นสคริปต์ Python ที่ใช้ในการดึงข้อมูลพยากรณ์อากาศจาก API ของกรมอุตุนิยมวิทยาและบันทึกข้อมูลลงในไฟล์ CSV
+CLI tool สำหรับดึงข้อมูลพยากรณ์อากาศจาก API ของกรมอุตุนิยมวิทยา รองรับหลายสถานที่ต่อครั้ง ทั้งแบบรายชั่วโมงและรายวัน บันทึกผลเป็น CSV
 
 ## การติดตั้ง
 
-### 1. คัดลอกไฟล์และติดตั้งแพ็คเกจที่จำเป็น
-
-1. ดาวน์โหลดหรือคัดลอกไฟล์ทั้งหมดจากโปรเจคนี้ไปยังเครื่องของคุณ
-
-    ```bash
-    git clone https://github.com/pyyupsk/weather-forecasting-project.git
-    ```
-
-2. เปิด Command Prompt หรือ Terminal และนำทางไปยังโฟลเดอร์โปรเจค
-
-    ```bash
-    cd weather-forecasting-project
-    ```
-
-### 2. สร้างและติดตั้งสภาพแวดล้อมเสมือน (Virtual Environment)
-
-- **Windows**
-
-  ```bash
-  setup.bat
-  ```
-
-- **macOS/Linux** (ถ้าต้องการใช้ระบบปฏิบัติการอื่น จะต้องสร้างสคริปต์ที่คล้ายกัน)
-
-  ```bash
-  python -m venv venv
-  source venv/bin/activate
-  pip install -r requirements.txt
-  ```
-
-### 3. รันโปรเจค
-
-- **Windows**
-
-  ```bash
-  run.bat
-  ```
-
-  หรือรันโดยตรงจาก Python
-
-  ```bash
-  python src/main.py
-  ```
+```bash
+git clone https://github.com/pyyupsk/weather-forecasting-project.git
+cd weather-forecasting-project
+uv sync
+```
 
 ## การตั้งค่า
 
-1. สร้างไฟล์ `.env` ในโฟลเดอร์หลักของโปรเจค
-2. ใส่โทเค็น API ของกรมอุตุนิยมวิทยาลงในไฟล์ `.env` ด้วยรูปแบบนี้:
+สร้างไฟล์ `.env` และใส่ API Token ของกรมอุตุนิยมวิทยา:
 
-   ```
-   TMD_API_TOKEN=your_api_token_here
-   ```
+```env
+TMD_API_TOKEN=your_api_token_here
+```
 
 ## การใช้งาน
 
-เมื่อรันสคริปต์ `src/main.py` โปรแกรมจะ:
+```bash
+# สถานที่เดียว
+uv run src/main.py --location นครปฐม สามพราน
 
-1. โหลด API Token จากไฟล์ `.env`
-2. ดึงข้อมูลพยากรณ์อากาศจาก API โดยใช้ข้อมูลที่กำหนด
-3. บันทึกข้อมูลลงในไฟล์ `weather_forecast_data.csv`
+# หลายสถานที่
+uv run src/main.py --location นครปฐม สามพราน --location กรุงเทพมหานคร พระนคร
 
-## การตั้งค่ารหัส (Code Style)
+# อ่านจากไฟล์ JSON
+uv run src/main.py --locations locations.example.json
 
-โปรเจคนี้ใช้ [flake8](https://flake8.pycqa.org/) สำหรับการตรวจสอบรหัสและมีการตั้งค่า `max-line-length` เป็น 120 ตัวอักษร
+# พิกัด GPS
+uv run src/main.py --lat 13.8 --lon 100.1
 
-สามารถทำการตั้งค่าได้ดังนี้จากไฟล์ [`setup.cfg`](setup.cfg)
+# พยากรณ์รายวัน 7 วัน
+uv run src/main.py --location นครปฐม สามพราน --forecast daily --duration 7
 
-```toml
-[flake8]
-max-line-length = 120
+# กำหนด output เอง
+uv run src/main.py --location นครปฐม สามพราน --output results.csv
 ```
 
-## ข้อผิดพลาดทั่วไป
+หรือใช้ `make run` แทน `uv run src/main.py`
 
-- ถ้าคุณพบข้อผิดพลาดเกี่ยวกับการติดตั้งแพ็คเกจหรือการสร้างสภาพแวดล้อมเสมือน โปรดตรวจสอบว่าได้ติดตั้ง Python และ Pip แล้ว
-- ตรวจสอบว่าได้ใส่โทเค็น API ในไฟล์ `.env` ถูกต้องหรือไม่
+## Flags
 
----
+| Flag                         | ค่าเริ่มต้น                      | คำอธิบาย                             |
+| ---------------------------- | ---------------------------- | ---------------------------------- |
+| `--location PROVINCE AMPHOE` | —                            | จังหวัด + อำเภอ (ใช้ซ้ำได้)               |
+| `--locations PATH`           | —                            | ไฟล์ JSON รายการสถานที่               |
+| `--lat` / `--lon`            | —                            | พิกัด GPS (ต้องใช้คู่กัน)                 |
+| `--forecast`                 | `hourly`                     | `hourly` หรือ `daily`               |
+| `--fields`                   | `tc,rh` / `tc_min,tc_max,rh` | ฟิลด์ที่ต้องการ คั่นด้วยคอมมา              |
+| `--date`                     | วันนี้ (GMT+7)                  | วันที่ในรูปแบบ `YYYY-MM-DD`            |
+| `--hour`                     | ชั่วโมงปัจจุบัน (GMT+7)           | ชั่วโมง 0–23 (เฉพาะ hourly)          |
+| `--duration`                 | `24`                         | จำนวนชั่วโมง (max 48) หรือวัน (max 126) |
+| `--output`                   | `weather_<ISO8601>.csv`      | path ไฟล์ CSV                       |
+| `--verbose`                  | `false`                      | เปิด DEBUG logging                  |
+
+## รูปแบบ locations JSON
+
+```json
+[
+  { "province": "นครปฐม", "amphoe": "สามพราน" },
+  { "province": "กรุงเทพมหานคร", "amphoe": "พระนคร" },
+  { "lat": 13.7563, "lon": 100.5018 }
+]
+```
+
+## คำสั่ง make
+
+| คำสั่ง              | ทำอะไร                   |
+| ---------------- | ----------------------- |
+| `make run`       | รัน CLI                  |
+| `make test`      | รัน pytest               |
+| `make check`     | lint + typecheck + test |
+| `make lint`      | ruff check              |
+| `make format`    | ruff format             |
+| `make typecheck` | pyright                 |
+| `make sync`      | uv sync                 |
+| `make audit`     | pip-audit               |
