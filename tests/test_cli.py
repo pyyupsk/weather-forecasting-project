@@ -4,7 +4,7 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from typer.testing import CliRunner
+from click.testing import CliRunner
 
 from cli import app
 

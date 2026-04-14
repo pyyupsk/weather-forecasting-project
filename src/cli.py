@@ -5,9 +5,6 @@ from pathlib import Path
 from typing import Any
 
 import click
-import typer
-import typer.main
-import typer.testing
 
 from client import fetch
 from config import get_token
@@ -126,26 +123,4 @@ def _main_cmd(
     click.echo(f"\nCompleted: {succeeded} succeeded, {failed} failed")
 
 
-# Wrap the pure-Click command in a Typer-compatible shim so that
-# typer.testing.CliRunner (which calls typer.main.get_command) works.
-class _ClickBackedTyper(typer.Typer):
-    """Typer subclass that delegates to a pre-built Click command."""
-
-    def __init__(self, click_command: click.Command, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self._click_command = click_command
-
-
-# Patch typer.testing to handle our shim transparently
-_orig_get_command = typer.testing._get_command
-
-
-def _patched_get_command(typer_instance: Any) -> click.Command:
-    if isinstance(typer_instance, _ClickBackedTyper):
-        return typer_instance._click_command
-    return _orig_get_command(typer_instance)
-
-
-typer.testing._get_command = _patched_get_command  # type: ignore[assignment]
-
-app: _ClickBackedTyper = _ClickBackedTyper(_main_cmd, add_completion=False)
+app = _main_cmd
