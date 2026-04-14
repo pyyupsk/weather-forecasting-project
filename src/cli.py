@@ -29,8 +29,15 @@ def _load_locations_file(path: Path) -> list[dict[str, Any]]:
 
 
 @click.command()
-@click.option("--location", nargs=2, multiple=True, metavar="PROVINCE AMPHOE", help="Province + amphoe pair. Repeatable.")
-@click.option("--locations", type=click.Path(exists=False, path_type=Path), default=None, help="JSON file with location list")
+@click.option(
+    "--location", nargs=2, multiple=True, metavar="PROVINCE AMPHOE", help="Province + amphoe pair. Repeatable."
+)
+@click.option(
+    "--locations",
+    type=click.Path(exists=False, path_type=Path),
+    default=None,
+    help="JSON file with location list",
+)
 @click.option("--lat", type=float, default=None, help="Latitude (requires --lon)")
 @click.option("--lon", type=float, default=None, help="Longitude (requires --lat)")
 @click.option("--forecast", default="hourly", help="hourly or daily")

@@ -1,16 +1,21 @@
 import json
 from pathlib import Path
 from typing import Any
-from unittest.mock import MagicMock
 
-import pytest
 from click.testing import CliRunner
 
 from cli import app
 
 runner = CliRunner()
 
-SAMPLE_DATA: dict = {"WeatherForecasts": [{"location": {"lat": 13.8, "lon": 100.1}, "forecasts": [{"time": "2026-04-13T08:00:00+07:00", "data": {"tc": 28.5, "rh": 75}}]}]}
+SAMPLE_DATA: dict = {
+    "WeatherForecasts": [
+        {
+            "location": {"lat": 13.8, "lon": 100.1},
+            "forecasts": [{"time": "2026-04-13T08:00:00+07:00", "data": {"tc": 28.5, "rh": 75}}],
+        }
+    ]
+}
 
 
 def _patch_fetch_success(mocker: Any) -> Any:

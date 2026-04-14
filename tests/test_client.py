@@ -1,8 +1,6 @@
 from typing import Any
 from unittest.mock import MagicMock
 
-import pytest
-
 from client import fetch
 
 BASE_KWARGS: dict[str, Any] = {

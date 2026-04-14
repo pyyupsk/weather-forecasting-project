@@ -2,10 +2,7 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
-import pytest
-
-from exporter import FIELD_LABELS, default_output_path, export
-
+from exporter import default_output_path, export
 
 SAMPLE_DATA: dict = {
     "WeatherForecasts": [
