@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import pytest
 from click.testing import CliRunner
 
 from cli import app
@@ -78,8 +79,8 @@ def test_coordinates_flag_calls_fetch_with_lat_lon(mocker: Any) -> None:
 
     assert result.exit_code == 0
     call_kwargs = fetch_mock.call_args[1]
-    assert call_kwargs["lat"] == 13.8
-    assert call_kwargs["lon"] == 100.1
+    assert call_kwargs["lat"] == pytest.approx(13.8)
+    assert call_kwargs["lon"] == pytest.approx(100.1)
 
 
 def test_no_location_exits_with_error(mocker: Any) -> None:
